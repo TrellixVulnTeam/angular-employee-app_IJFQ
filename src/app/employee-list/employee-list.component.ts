@@ -27,6 +27,9 @@ export class EmployeeListComponent implements OnInit {
       if(data["data"] !=null && data["data"] !=undefined)
       {
         this.employees=data["data"];
+      }else
+      {
+        this.employees=[];
       }
     })
   }

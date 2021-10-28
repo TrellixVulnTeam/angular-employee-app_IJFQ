@@ -16,17 +16,13 @@ export class EmployeeDetailComponent implements OnInit {
   constructor(private employeeService:EmployeeService,private toastr: ToastrService,private router: Router,private route: ActivatedRoute) { }
 
   submitted : boolean=false;
-
   employee:Employee = new Employee();
-
   departments:Department[]=[];
-  
   managers:Manager[]=[];
-
   id :number=0;
+  errorMessage:string[]=[];
 
   ngOnInit(): void {
-
     this.id = this.route.snapshot.params['id'];
     this.getDepartments();
     this.getManagers();
@@ -44,61 +40,22 @@ export class EmployeeDetailComponent implements OnInit {
     })
   }
 
-  createEmployee(){
+  updateEmployee(){
 
-    if(!this.employee.firstName && this.employee.firstName.length < 2)
-    {
-      this.toastr.warning("First Name can not b null or less then 2 character's");
-      return;
-    }
-
-    if(!this.employee.lastName && this.employee.lastName.length < 2)
-    {
-      this.toastr.warning("Last Name can not b null or less then 2 character's");
-      return;
-    }
-
-    if(this.employee.phoneNumber.length <=0
-       && this.phoneOnlyValidator(this.employee.phoneNumber))
-    {
-      this.toastr.warning("Phone Number contain only digits and dashs ");
-      return;
-    }
-
-    if(!this.employee.salary && this.employee.salary==0)
-    {
-      this.toastr.warning("salary is greater than 0");
-      return;
-    }
-
-    if(this.employee.department.id==0)
-    {
-      this.toastr.warning("Please Select Department");
-      return;
-    }
-
-    if(!this.employee.hireDate)
-    {
-      this.toastr.warning("Please Select Hire Date");
-      return;
-    }
-
-    if(this.employee.manager.id==0)
-    {
-      this.toastr.warning("Please Select Manager");
-      return;
-    }
-
-
+    this.validation();
     this.employeeService
-    .updateEmployeeData(this.employee).subscribe(data => {
-      this.toastr.success("Employee is Updated Successfuly !");
+    .updateEmployeeData(this.employee).subscribe({
+      next: data => {
+        this.toastr.success("Employee is updated Successfuly !");
+        this.employee = new Employee();
+        this.gotoList();
 
-      this.employee= new Employee();
-      this.gotoList();
-
-    }, 
-    error => console.log(error));
+      },
+      error: error => {
+        this.errorMessage= error.error;
+        console.error('There was an error!', error.error);
+      }
+    })
     
   }
   gotoList() {
@@ -142,6 +99,25 @@ export class EmployeeDetailComponent implements OnInit {
 
   changeManager(e:any){
     this.employee.manager.id=e.target.value;
+  }
+
+  validation() {
+
+    if (this.employee.department.id == 0) {
+      this.toastr.warning("Please Select Department");
+      return;
+    }
+
+    if (!this.employee.hireDate) {
+      this.toastr.warning("Please Select Hire Date");
+      return;
+    }
+
+    if (this.employee.manager.id == 0) {
+      this.toastr.warning("Please Select Manager");
+      return;
+    }
+
   }
 
 }

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Employee } from './models/employee';
@@ -22,8 +22,8 @@ export class EmployeeService {
   constructor(private http: HttpClient) { }
 
 
-  createEmployee(employee: Object): Observable<Object> {
-    return this.http.post(`${this.saveEmployee}`, employee);
+  createEmployee(employee: Object): Observable<HttpResponse<any>> {
+    return this.http.post(`${this.saveEmployee}`, employee, {observe: 'response'});
   }
 
   updateEmployeeData(employee: Object): Observable<Object> {
